@@ -41,14 +41,16 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
     '''
 })
+with open("modelu.json", encoding="utf-8") as file:
+    sravnenue = json.load(file)
 
 
 headers = {
     "Accept" : "application/json, text/javascript, */*; q=0.01",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
-"""
-url = "https://motoallegro.net/ru/b-catalog/a-class/"
+
+"""url = "https://motoallegro.net/ru/b-catalog/a-class/"
 driver.get(url=url)
 time.sleep(1)
 
@@ -141,8 +143,10 @@ for item in href_three_page:
     item = str(item)
     href_part = item[item.find("<a href")+9 : item.find('/">')+1]
     print(href_part)"""
-href_part = "https://motoallegro.net/ru/detail/prod-15483426354/"
-
+href_part = "https://motoallegro.net/ru/detail/prod-15733303377/"
+model = ''
+kuzov = ''
+year = ''
 driver.get(url=href_part)
 time.sleep(1)
 with open(f"one_part.html", "w", encoding="utf-8") as file:
@@ -155,19 +159,87 @@ title_name = str(soup_one.find_all("h1", class_="product-info__title"))
 title_name = title_name.replace("  ","").replace("\n"," ").replace("/r"," ")
 marka_and_model_and_num_zap = title_name[title_name.find('_title">  ')+10 : title_name.find('  </h1>')]
 print(marka_and_model_and_num_zap)
+all_words = marka_and_model_and_num_zap.replace('-',' ').lower().split()
+print(all_words)
+for kym, ma in sravnenue.items():
+    
+    
+    
+    
+    if str(ma).lower() in all_words:
+        kuz = kym[: kym.find('   ')]
+        print(kuz)
+        m = kym[kym.find('  ')+2 : kym.find(' ') ]
+        marka = ma
+        if (len(str(kuz))>0) and (str(kuz).lower() in all_words):
+            kuzov = kuz
+            year = kym[kym.find('   ') : kym.find('  ')]
+            model = m
+        elif str(m).lower() in all_words:
+            model = m
+            year = kym[kym.find('   ') : kym.find('  ')]
+        
 info = soup_one.find_all("div", class_="characteristic__item")
 #print(info)
+status = "б/у"
+side = ''
+prouzbod_text = ''
+nomer = ''
+ka4estvo = ''
+price = ''
+number_lot = ''
 for item in info:
     
-    #print(item.text, "Здесь текст!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    #Статус запчасти - новая или бу
     item = str(item)
     if "cостояние:" in item:
-        print(item, "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        print(item)
-        status = item[item.find('characteristic__value">') + 23 : item.find(' </span> ')].replace(" ","")
+        #print(item)
+        status = item[item.find('characteristic__value">') + 23 : item.find(' </span> ')]
+        if ("новое" in status) or ("новый" in status) or ("новые" in status) or ("новая" in status) :
+            status = "новая"
+        else:
+            status = 'б/у'
+    if "производитель запчасти:" in item:
+        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+        #print(item)
+        prouzbod_text = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
+    if "сторона:" in item:
+        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+        #print(item)
+        side = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
+    if "номер каталожный запчасти:" in item:
+        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+        #print(item)
+        nomer = item[item.find('_blank') + 8 : item.find('</a>')]
+    if "качество запчасти" in item:
+        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+        #print(item)
+        ka4estvo = item[item.find('"characteristic__value">') + 24 : item.find('</span> </div')].replace("pojazdu","на траспортном средстве")
+    if "номери католожные заменителей:" in item:
+        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+        #print(item)
+        zamena = item[item.find('_blank') + 8 : item.find('</a>')]
+price_obj = soup_one.find_all("span", class_="product-total__dollars")
+for item in price_obj:
+    price = item.text.replace("$","").replace(" ","")
+number_lot_obj = soup_one.find_all("span", class_="product-info__lot-value")
+for item in number_lot_obj:
+    number_lot = item.text.replace("$","").replace(" ","")
+
+print()
+print(marka)
+print(model)
+print(year)
+print(zamena)
+print(ka4estvo)
+print(number_lot)
+print(price)
+print(nomer)
+print(side)    
+print(prouzbod_text)
 print(status)
-    
 
 
-a = input("Введи любое число, чтобы закончить - ")
+
+#a = input("Введи любое число, чтобы закончить - ")
