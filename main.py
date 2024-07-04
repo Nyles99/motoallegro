@@ -16,6 +16,10 @@ import csv
 from PIL import Image, UnidentifiedImageError
 import time
 
+
+input_name = input("Как назовем файл? - ")
+pricing = input("Введи цифру ценообразования от 1 до 5 - ")
+
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
@@ -50,9 +54,247 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
-"""url = "https://motoallegro.net/ru/b-catalog/a-class/"
+if os.path.exists(f"{input_name}_zzap.csv"):
+    print("файл csv уже есть")
+else:
+    with open(f"{input_name}_zzap.csv", "w", encoding="utf-8") as file_data:
+        writer = csv.writer(file_data)
+
+        writer.writerow(
+            (
+                "ПРОИЗВОДИТЕЛЬ",
+                "НОМЕР ДЕТАЛИ",
+                "НАИМЕНОВАНИЕ ДЕТАЛИ",
+                "ОПИСАНИЕ ZZAP",
+                "ЦЕНА",
+                "СОСТОЯНИЕ",
+                "СРОК ДОСТАВКИ",
+                "ФОТО",
+            )
+        )
+
+if os.path.exists(f"{input_name}_drom.csv"):
+    print("файл csv уже есть")
+else:
+    with open(f"{input_name}_drom.csv", "w", encoding="utf-8") as file_data:
+        writer = csv.writer(file_data)
+
+        writer.writerow(
+            (
+                "АРТИКУЛ",
+                "НАИМЕНОВАНИЕ ДЕТАЛИ",
+                "СОСТОЯНИЕ",
+                "МАРКА",
+                "МОДЕЛЬ",
+                "ВЕРСИЯ",
+                "НОМЕР ДЕТАЛИ",
+                "ОБЪЕМ ДВИГАТЕЛЯ",
+                "ГОД",
+                "L_R",
+                "F_R",
+                "U_D",
+                "ЦВЕТ",
+                "ОПИСАНИЕ DROM",
+                "КОЛИЧЕСТВО",
+                "ЦЕНА",
+                "НАЛИЧИЕ",
+                "СРОК ДОСТАВКИ",
+                "ФОТО",
+            )
+        )
+
+
+
+url = "https://motoallegro.net/ru/b-catalog/a-class/"
 driver.get(url=url)
 time.sleep(1)
+marka = ''
+model = ''
+version = ''
+year = ''
+
+kuzova = []
+for kym, ma in sravnenue.items():     
+    kuz = kym[: kym.find(':')]
+    if len(str(kuz))>0:
+        kuzova.append(kuz)
+print(kuzova)
+def pars_card(href_card, name_zap):
+    name_zap1 = ''
+    href_part = href_card
+    #href_part = "https://motoallegro.net/ru/detail/prod-15733303377/"
+    marka = ''
+    model = ''
+    version = ''
+    year = ''
+    volume = ''
+    fuel = ''
+    transmission = ''
+    car_body = ''
+    driver.get(url=href_part)
+    time.sleep(1)
+    with open(f"one_part.html", "w", encoding="utf-8") as file:
+        file.write(driver.page_source)
+
+    with open(f"one_part.html", encoding="utf-8") as file:
+        src_one_part = file.read()
+    soup_one = BeautifulSoup(src_one_part, 'html.parser')
+    title_name = str(soup_one.find_all("h1", class_="product-info__title"))
+    title_name = title_name.replace("  ","").replace("\n"," ").replace("/r"," ")
+    marka_and_model_and_num_zap = title_name[title_name.find('_title">  ')+10 : title_name.find('  </h1>')]
+    #print(marka_and_model_and_num_zap)
+    marka_and_model_and_num_zap = marka_and_model_and_num_zap.lower().replace("amg","mercedes")
+    if "крепления" in marka_and_model_and_num_zap:
+        name_zap1 = "крепления" + ' для ' + name_zap
+    elif "крепление" in marka_and_model_and_num_zap:
+        name_zap1 = "крепление" + ' для ' + name_zap
+    else:
+        name_zap1 = name_zap
+    all_words = marka_and_model_and_num_zap.replace('-',' ').split()
+
+    #print(all_words)
+    n = 0
+    for kym, ma in sravnenue.items():
+        if n != 1:     
+            if str(ma).lower() in all_words:
+                
+                m = kym[kym.find(';')+1 : kym.find(' ') ]
+                #print(m)
+                marka = ma
+                for ku in kuzova:
+                    if n !=1:
+                        if str(ku).lower() in all_words:
+                            print(ku)
+                            version = ku
+                            year = kym[kym.find(':')+1 : kym.find(';')]
+                            model = m
+                            n=1
+                        elif str(m).lower() in all_words:
+                            model = m
+                            year = kym[kym.find(':') : kym.find(';')]
+                        else:
+                            marka = ma
+                            model = marka_and_model_and_num_zap
+                            version = "!!!!!!!"
+                            year = "!!!!!!!!"
+            
+    info = soup_one.find_all("div", class_="characteristic__item")
+    #print(info)
+    status = "б/у"
+    side = ''
+    prouzbod_text = ''
+    nomer = ''
+    ka4estvo = ''
+    price = ''
+    number_lot = ''
+    zamena = ''
+    for item in info:
+        
+        #Статус запчасти - новая или бу
+        item = str(item)
+        if "cостояние:" in item:
+            item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+            #print(item)
+            status = item[item.find('characteristic__value">') + 23 : item.find(' </span> ')]
+            if ("новое" in status) or ("новый" in status) or ("новые" in status) or ("новая" in status) :
+                status = "новая"
+            else:
+                status = 'б/у'
+        if "производитель запчасти:" in item:
+            item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+            #print(item)
+            proizvoditel = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
+        if "сторона:" in item:
+            item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+            #print(item)
+            side = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
+        if "номер каталожный запчасти:" in item:
+            item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+            #print(item)
+            num_zap = item[item.find('_blank') + 8 : item.find('</a>')]
+        if "качество запчасти" in item:
+            item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+            #print(item)
+            ka4estvo = item[item.find('"characteristic__value">') + 24 : item.find('</span> </div')].replace("pojazdu","на траспортном средстве")
+        if "номери католожные заменителей:" in item:
+            item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
+            #print(item)
+            zamena = item[item.find('_blank') + 8 : item.find('</a>')]
+    price_obj = soup_one.find_all("span", class_="product-total__dollars")
+    for item in price_obj:
+        price = item.text.replace("$","").replace(" ","")
+    number_lot_obj = soup_one.find_all("span", class_="product-info__lot-value")
+    for item in number_lot_obj:
+        artical = item.text.replace("$","").replace(" ","")
+
+    print()
+    print(marka)
+    print(model)
+    print(year)
+    print(version)
+    print(zamena)
+    print(ka4estvo)
+    print(artical)
+    print(price)
+    print(num_zap)
+    print(side)    
+    print(proizvoditel)
+    print(status)
+    print(name_zap1)
+    text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap} Склад: {pricing}_{price}_PL. {status}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
+                    
+    text_drom = f'{name_zap1} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}.' \
+                 'Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap} Склад: {pricing}_{price}_PL. {status}. ' \
+                 'Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. ' \
+                 'Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения,' \
+                 'где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). ' \
+                 'Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, ' \
+                 f'строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!'.replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
+    file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
+    writer = csv.writer(file)
+
+    writer.writerow(
+        (
+            proizvoditel,
+            num_zap,
+            name_zap1,
+            text_zzap,
+            price,
+            status,
+            "10-14 дня",
+            href_card,                                  
+        )
+    )
+    file.close()
+
+    file = open(f"{input_name}_drom.csv", "a", encoding="utf-8", newline='')
+    writer = csv.writer(file)
+
+    writer.writerow(
+        (
+            f"АРТИКУЛ: D-{artical}",
+            name_zap1,
+            status,
+            marka,
+            model,
+            version,
+            num_zap,
+            volume,
+            year,
+            "",
+            "",
+            "",
+            "",
+            text_drom,
+            "1",
+            price,
+            "под заказ",
+            "10-14 дня",
+            href_card,                                   
+        )
+    )
+    file.close()
+    return(marka, model, year, version, zamena, ka4estvo, number_lot, price, nomer, side, prouzbod_text, status)
 
 with open(f"first.html", "w", encoding="utf-8") as file:
     file.write(driver.page_source)
@@ -64,6 +306,7 @@ href_first_page = soup.find_all("div", class_="categories-item__header")
 
 zapchast_and_href = {}
 two_zapchast_and_href = {}
+list_two_zapchast_and_href = {}
 #print(href_first_page)
 nomer = 1
 for item in href_first_page:
@@ -107,10 +350,14 @@ for item_two in list_second:
     name_href_second = item_two[item_two.find('/">')+3 : item.find('</a>')]
     print(href_second, name_href_second, number)
     two_zapchast_and_href[href_second] = number
+    list_two_zapchast_and_href[href_second] = name_href_second
     number += 1
 
 with open("second_href.json", "a", encoding="utf-8") as file:
     json.dump(two_zapchast_and_href, file, indent=4, ensure_ascii=False)
+
+with open("three_href.json", "a", encoding="utf-8") as file:
+    json.dump(list_two_zapchast_and_href, file, indent=4, ensure_ascii=False)
 
 input_number_second = int(input("Введи номер подраздела(в последней части), который тебя интересует -  "))
 
@@ -121,11 +368,16 @@ for last_categoria, num_2 in second_pars.items():
     #print(input_number_second, num_2)
     if input_number_second == int(num_2):
         print(f"Ты выбрал категорию {last_categoria}")
-        url = last_categoria
+        
 
+        url = last_categoria
+for url_categoria, name_href_2 in list_two_zapchast_and_href.items():
+    if url == url_categoria:
+        name_zap = name_href_2
 os.remove("first.html")
 os.remove("first_href.json")
 os.remove("second_href.json")
+os.remove("three_href.json")
 
 driver.get(url=url)
 time.sleep(1)
@@ -142,103 +394,10 @@ for item in href_three_page:
     #print(item)
     item = str(item)
     href_part = item[item.find("<a href")+9 : item.find('/">')+1]
-    print(href_part)"""
-href_part = "https://motoallegro.net/ru/detail/prod-15733303377/"
-model = ''
-kuzov = ''
-year = ''
-driver.get(url=href_part)
-time.sleep(1)
-with open(f"one_part.html", "w", encoding="utf-8") as file:
-    file.write(driver.page_source)
+    print(href_part)
+    pars_card(href_part, name_zap)
 
-with open(f"one_part.html", encoding="utf-8") as file:
-    src_one_part = file.read()
-soup_one = BeautifulSoup(src_one_part, 'html.parser')
-title_name = str(soup_one.find_all("h1", class_="product-info__title"))
-title_name = title_name.replace("  ","").replace("\n"," ").replace("/r"," ")
-marka_and_model_and_num_zap = title_name[title_name.find('_title">  ')+10 : title_name.find('  </h1>')]
-print(marka_and_model_and_num_zap)
-all_words = marka_and_model_and_num_zap.replace('-',' ').lower().split()
-print(all_words)
-for kym, ma in sravnenue.items():
-    
-    
-    
-    
-    if str(ma).lower() in all_words:
-        kuz = kym[: kym.find('   ')]
-        print(kuz)
-        m = kym[kym.find('  ')+2 : kym.find(' ') ]
-        marka = ma
-        if (len(str(kuz))>0) and (str(kuz).lower() in all_words):
-            kuzov = kuz
-            year = kym[kym.find('   ') : kym.find('  ')]
-            model = m
-        elif str(m).lower() in all_words:
-            model = m
-            year = kym[kym.find('   ') : kym.find('  ')]
-        
-info = soup_one.find_all("div", class_="characteristic__item")
-#print(info)
-status = "б/у"
-side = ''
-prouzbod_text = ''
-nomer = ''
-ka4estvo = ''
-price = ''
-number_lot = ''
-for item in info:
-    
-    #Статус запчасти - новая или бу
-    item = str(item)
-    if "cостояние:" in item:
-        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        #print(item)
-        status = item[item.find('characteristic__value">') + 23 : item.find(' </span> ')]
-        if ("новое" in status) or ("новый" in status) or ("новые" in status) or ("новая" in status) :
-            status = "новая"
-        else:
-            status = 'б/у'
-    if "производитель запчасти:" in item:
-        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        #print(item)
-        prouzbod_text = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
-    if "сторона:" in item:
-        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        #print(item)
-        side = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
-    if "номер каталожный запчасти:" in item:
-        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        #print(item)
-        nomer = item[item.find('_blank') + 8 : item.find('</a>')]
-    if "качество запчасти" in item:
-        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        #print(item)
-        ka4estvo = item[item.find('"characteristic__value">') + 24 : item.find('</span> </div')].replace("pojazdu","на траспортном средстве")
-    if "номери католожные заменителей:" in item:
-        item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
-        #print(item)
-        zamena = item[item.find('_blank') + 8 : item.find('</a>')]
-price_obj = soup_one.find_all("span", class_="product-total__dollars")
-for item in price_obj:
-    price = item.text.replace("$","").replace(" ","")
-number_lot_obj = soup_one.find_all("span", class_="product-info__lot-value")
-for item in number_lot_obj:
-    number_lot = item.text.replace("$","").replace(" ","")
 
-print()
-print(marka)
-print(model)
-print(year)
-print(zamena)
-print(ka4estvo)
-print(number_lot)
-print(price)
-print(nomer)
-print(side)    
-print(prouzbod_text)
-print(status)
 
 
 

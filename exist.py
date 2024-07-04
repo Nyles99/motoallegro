@@ -24,6 +24,9 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
 
+
+
+
 req = requests.get(url=url, headers=headers)
 src = req.text
 
@@ -62,7 +65,7 @@ for item in mar:
                 version = item[item.find('car-info__car-models')+22 : item.find('car-info__car-years')-19]
                 year = item[item.find('car-info__car-years')+24 : item.find('</b>')]
                 print( model , version, year)
-                stroka = str(version)+ "   " + str(year)+ "  " + str(model)
+                stroka = str(version)+ ":" + str(year)+ ";" + str(model) + " "
                 spisok[stroka] = marka
 
                 
