@@ -41,7 +41,7 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
     '''
 })
-with open("modelu.json", encoding="utf-8") as file:
+with open("mercedes.json", encoding="utf-8") as file:
     sravnenue = json.load(file)
 
 
@@ -51,11 +51,12 @@ headers = {
 }
 
 
+kuzova = []
 
 
-href_part = "https://motoallegro.net/ru/detail/prod-15961190941/?attempt=1"
+href_part = "https://motoallegro.net/ru/detail/prod-14234085813/"
 model = ''
-kuzov = ''
+version = ''
 year = ''
 driver.get(url=href_part)
 time.sleep(1)
@@ -71,29 +72,38 @@ marka_and_model_and_num_zap = title_name[title_name.find('_title">  ')+10 : titl
 print(marka_and_model_and_num_zap)
 all_words = marka_and_model_and_num_zap.replace('-',' ').lower().split()
 print(all_words)
+n = 0
 for kym, ma in sravnenue.items():
-    
-    
-    
-    
-    if str(ma).lower() in all_words:
+    print(kym)
+    for kym, ma in sravnenue.items():     
         kuz = kym[: kym.find(':')]
-        print(kuz)
-        m = kym[kym.find(';')+1 : kym.find(' ') ]
-        print(m)
-        marka = ma
-        if (len(str(kuz))>0) and (str(kuz).lower() in all_words):
-            kuzov = kuz
-            year = kym[kym.find(':')+1 : kym.find(';')]
-            model = m
-        elif str(m).lower() in all_words:
-            model = m
-            year = kym[kym.find(':') : kym.find(';')]
-        else:
-            marka = "ничего"
-            model = "не"
-            kuzov = "нашлось"
-            year = "!!!!!!!!"
+        if len(str(kuz))>0:
+            kuzova.append(kuz)
+    print(kuzova)
+    if n != 1:     
+        if str(ma).lower() in all_words:
+            
+            m = kym[kym.find(';')+1 : kym.find(' ') ]
+            print(m)
+            #print(m)
+            marka = ma
+            for ku in kuzova:
+                if n !=1:
+                    if str(ku).lower() in all_words:
+                        print(ku)
+                        print(m)
+                        version = ku
+                        year = kym[kym.find(':')+1 : kym.find(';')]
+                        model = m
+                        n=1
+                    elif str(m).lower() in all_words:
+                        model = m
+                        year = kym[kym.find(':') : kym.find(';')]
+                    else:
+                        marka = ma
+                        model = marka_and_model_and_num_zap
+                        version = "!!!!!!!"
+                        year = "!!!!!!!!"
         
 info = soup_one.find_all("div", class_="characteristic__item")
 #print(info)
@@ -148,7 +158,7 @@ print()
 print(marka)
 print(model)
 print(year)
-print(kuzov)
+print(version)
 print(zamena)
 print(ka4estvo)
 print(number_lot)

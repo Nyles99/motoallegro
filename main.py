@@ -45,7 +45,7 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
     '''
 })
-with open("modelu.json", encoding="utf-8") as file:
+with open("mercedes.json", encoding="utf-8") as file:
     sravnenue = json.load(file)
 
 
@@ -100,6 +100,7 @@ else:
                 "НАЛИЧИЕ",
                 "СРОК ДОСТАВКИ",
                 "ФОТО",
+                "Описание запчасти",
             )
         )
 
@@ -169,6 +170,7 @@ def pars_card(href_card, name_zap):
                             year = kym[kym.find(':')+1 : kym.find(';')]
                             model = m
                             n=1
+                            
                         elif str(m).lower() in all_words:
                             model = m
                             year = kym[kym.find(':') : kym.find(';')]
@@ -290,7 +292,8 @@ def pars_card(href_card, name_zap):
             price,
             "под заказ",
             "10-14 дня",
-            href_card,                                   
+            href_card,
+            marka_and_model_and_num_zap,                                   
         )
     )
     file.close()
