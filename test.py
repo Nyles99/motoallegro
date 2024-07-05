@@ -52,7 +52,11 @@ headers = {
 
 
 kuzova = []
-
+for kym, ma in sravnenue.items():     
+    kuz = kym[: kym.find(':')]
+    if len(str(kuz))>0:
+        kuzova.append(kuz)
+print(kuzova)
 
 href_part = "https://motoallegro.net/ru/detail/prod-14234085813/"
 model = ''
@@ -71,40 +75,39 @@ title_name = title_name.replace("  ","").replace("\n"," ").replace("/r"," ")
 marka_and_model_and_num_zap = title_name[title_name.find('_title">  ')+10 : title_name.find('  </h1>')]
 print(marka_and_model_and_num_zap)
 all_words = marka_and_model_and_num_zap.replace('-',' ').lower().split()
-print(all_words)
+#print(all_words)
 n = 0
 for kym, ma in sravnenue.items():
-    print(kym)
-    for kym, ma in sravnenue.items():     
-        kuz = kym[: kym.find(':')]
-        if len(str(kuz))>0:
-            kuzova.append(kuz)
-    print(kuzova)
+    #print(kym)
+    
     if n != 1:     
         if str(ma).lower() in all_words:
             
             m = kym[kym.find(';')+1 : kym.find(' ') ]
-            print(m)
+            #print(m)
             #print(m)
             marka = ma
-            for ku in kuzova:
-                if n !=1:
-                    if str(ku).lower() in all_words:
-                        print(ku)
-                        print(m)
+            ku = kym[: kym.find(':')]
+            if len(str(ku))>0:
+                if str(ku).lower() in all_words:
+                    if n !=1:
+                        #print(ku)
+                        #print(m)
                         version = ku
                         year = kym[kym.find(':')+1 : kym.find(';')]
                         model = m
                         n=1
-                    elif str(m).lower() in all_words:
-                        model = m
-                        year = kym[kym.find(':') : kym.find(';')]
-                    else:
-                        marka = ma
-                        model = marka_and_model_and_num_zap
-                        version = "!!!!!!!"
-                        year = "!!!!!!!!"
-        
+                else:
+                    marka = ma
+                    model = marka_and_model_and_num_zap
+                    version = "!!!!!!!"
+                    year = "!!!!!!!!"
+foto = ''
+foto_obj = str(soup_one.find("div", class_="product-frame__frame js--init-product-frame"))
+#print(foto_obj)
+foto = foto_obj[foto_obj.find('data-img="1"')+19 : foto_obj.find('<picture class="product-frame__picture">')-3]
+print(foto)
+
 info = soup_one.find_all("div", class_="characteristic__item")
 #print(info)
 status = "б/у"
@@ -115,6 +118,7 @@ ka4estvo = ''
 price = ''
 number_lot = ''
 zamena = ''
+proizvoditel = ''
 for item in info:
     
     #Статус запчасти - новая или бу
@@ -130,7 +134,7 @@ for item in info:
     if "производитель запчасти:" in item:
         item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
         #print(item)
-        prouzbod_text = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
+        prouzbod_text = str(item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]).replace(" с","")
     if "сторона:" in item:
         item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
         #print(item)

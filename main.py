@@ -119,7 +119,7 @@ for kym, ma in sravnenue.items():
     kuz = kym[: kym.find(':')]
     if len(str(kuz))>0:
         kuzova.append(kuz)
-print(kuzova)
+#print(kuzova)
 def pars_card(href_card, name_zap):
     name_zap1 = ''
     href_part = href_card
@@ -149,6 +149,16 @@ def pars_card(href_card, name_zap):
         name_zap1 = "крепления" + ' для ' + name_zap
     elif "крепление" in marka_and_model_and_num_zap:
         name_zap1 = "крепление" + ' для ' + name_zap
+    elif "pokrywa" in marka_and_model_and_num_zap:
+        name_zap1 = "покрышка" + ' для ' + name_zap
+    elif "заслонка жалюзи вентилятора" in marka_and_model_and_num_zap:
+        name_zap1 = "заслонка жалюзи вентилятора"
+    elif "заглушка омывателя фары" in marka_and_model_and_num_zap:
+        name_zap1 = "заглушка омывателя фары"
+    elif "рамка окуляр" in marka_and_model_and_num_zap:
+        name_zap1 = "заглушка омывателя фары"
+    elif "накладка" in marka_and_model_and_num_zap:
+        name_zap1 = "накладка" + ' для ' + name_zap
     else:
         name_zap1 = name_zap
     all_words = marka_and_model_and_num_zap.replace('-',' ').split()
@@ -156,30 +166,45 @@ def pars_card(href_card, name_zap):
     #print(all_words)
     n = 0
     for kym, ma in sravnenue.items():
-        if n != 1:     
+        #print(kym)
+        
+        if n != 1:
+            ku = kym[: kym.find(':')]     
             if str(ma).lower() in all_words:
                 
                 m = kym[kym.find(';')+1 : kym.find(' ') ]
                 #print(m)
+                #print(m)
                 marka = ma
-                for ku in kuzova:
-                    if n !=1:
-                        if str(ku).lower() in all_words:
-                            print(ku)
+                
+                if len(str(ku))>0:
+                    if str(ku).lower() in all_words:
+                        if n !=1:
+                            #print(ku)
+                            #print(m)
                             version = ku
                             year = kym[kym.find(':')+1 : kym.find(';')]
                             model = m
                             n=1
-                            
-                        elif str(m).lower() in all_words:
-                            model = m
-                            year = kym[kym.find(':') : kym.find(';')]
-                        else:
-                            marka = ma
-                            model = marka_and_model_and_num_zap
-                            version = "!!!!!!!"
-                            year = "!!!!!!!!"
-            
+                    else:
+                        marka = ma
+                        model = marka_and_model_and_num_zap
+                        version = "!!!!!!!"
+                        year = "!!!!!!!!"
+            else:
+                if (str(ma).lower() in all_words) or (str(ku).lower() in all_words):
+                    m = kym[kym.find(';')+1 : kym.find(' ') ]
+                    version = ku
+                    year = kym[kym.find(':')+1 : kym.find(';')]
+                    model = m
+                    marka = ma
+
+    foto = ''
+    foto_obj = str(soup_one.find("div", class_="product-frame__frame js--init-product-frame"))
+    #print(foto_obj)
+    foto = foto_obj[foto_obj.find('data-img="1"')+19 : foto_obj.find('<picture class="product-frame__picture">')-3]
+    print(foto)
+
     info = soup_one.find_all("div", class_="characteristic__item")
     #print(info)
     status = "б/у"
@@ -190,6 +215,7 @@ def pars_card(href_card, name_zap):
     price = ''
     number_lot = ''
     zamena = ''
+    num_zap = ''
     for item in info:
         
         #Статус запчасти - новая или бу
@@ -205,7 +231,7 @@ def pars_card(href_card, name_zap):
         if "производитель запчасти:" in item:
             item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
             #print(item)
-            proizvoditel = item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]
+            proizvoditel = str(item[item.find('characteristic__value">') + 24 : item.find(' </span> ')]).replace(" с","")
         if "сторона:" in item:
             item = item.replace("  ","").replace("\n"," ").replace("/r"," ")
             #print(item)
@@ -246,12 +272,12 @@ def pars_card(href_card, name_zap):
     text_zzap = f"{marka} {model} {version} {year}г.в., {fuel}, {volume}, {transmission}, {car_body}. Будьте готовы назвать АРТИКУЛ: Z-{artical}.{num_zap} Склад: {pricing}_{price}_PL. {status}.".replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
                     
     text_drom = f'{name_zap1} {marka} {model} {version} {year}г.в., {fuel}, {volume}, {car_body}.' \
-                 'Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap} Склад: {pricing}_{price}_PL. {status}. ' \
-                 'Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. ' \
-                 'Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения,' \
-                 'где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). ' \
-                 'Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, ' \
-                 f'строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!'.replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
+                f'Будьте готовы назвать АРТИКУЛ: D-{artical}.{num_zap} Склад: {pricing}_{price}_PL. {status}. ' \
+                'Задавайте, пожалуйста, вопросы непосредственно перед заключением сделки, остатки меняются ежедневно. ' \
+                'Доставку осуществляем ТК сразу в ваш город. Срок доставки до Москвы 2-4 дня, бывают исключения,' \
+                'где сроки доставки могут увеличиться. Состояние вы оцениваете сами, по предоставленным фотографиям). ' \
+                'Если деталь не понадобилась - возврат не рассматривается! По VIN автомобиля запчасти не подбираем, ' \
+                f'строго по заводскому номеру, указанному на детали. С Уважением, компания REPPART!'.replace(",     "," ").replace("     ","").replace("    .",".").replace("   .",".").replace("  .",".").replace(" .",".").replace(",  ",", ")
     file = open(f"{input_name}_zzap.csv", "a", encoding="utf-8", newline='')
     writer = csv.writer(file)
 
@@ -264,6 +290,7 @@ def pars_card(href_card, name_zap):
             price,
             status,
             "10-14 дня",
+            foto,
             href_card,                                  
         )
     )
@@ -292,6 +319,7 @@ def pars_card(href_card, name_zap):
             price,
             "под заказ",
             "10-14 дня",
+            foto,
             href_card,
             marka_and_model_and_num_zap,                                   
         )
@@ -371,35 +399,37 @@ for last_categoria, num_2 in second_pars.items():
     #print(input_number_second, num_2)
     if input_number_second == int(num_2):
         print(f"Ты выбрал категорию {last_categoria}")
-        
-
-        url = last_categoria
+        url_1 = last_categoria
 for url_categoria, name_href_2 in list_two_zapchast_and_href.items():
-    if url == url_categoria:
+    if url_1 == url_categoria:
         name_zap = name_href_2
 os.remove("first.html")
 os.remove("first_href.json")
 os.remove("second_href.json")
 os.remove("three_href.json")
 
-driver.get(url=url)
-time.sleep(1)
-with open(f"three.html", "w", encoding="utf-8") as file:
-    file.write(driver.page_source)
+for page in range(1,200):
+    url = url_1 + f"{page}/"
+    driver.get(url=url)
+    time.sleep(1)
+    with open(f"three.html", "w", encoding="utf-8") as file:
+        file.write(driver.page_source)
 
-with open(f"three.html", encoding="utf-8") as file:
-    src = file.read()
-soup = BeautifulSoup(src, 'html.parser')
-href_three_page = soup.find_all("div", class_="card item-card-link products__card")
+    with open(f"three.html", encoding="utf-8") as file:
+        src = file.read()
+    soup = BeautifulSoup(src, 'html.parser')
+    href_three_page = soup.find_all("div", class_="card item-card-link products__card")
 
-#print(href_three_page)
-for item in href_three_page:
-    #print(item)
-    item = str(item)
-    href_part = item[item.find("<a href")+9 : item.find('/">')+1]
-    print(href_part)
-    pars_card(href_part, name_zap)
+    #print(href_three_page)
+    for item in href_three_page:
+        #print(item)
+        item = str(item)
+        href_part = item[item.find("<a href")+9 : item.find('/">')+1]
+        print(href_part)
+        pars_card(href_part, name_zap)
 
+os.remove("three.html")
+os.remove("one_part.html")
 
 
 
