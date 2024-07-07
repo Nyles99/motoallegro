@@ -159,6 +159,56 @@ def pars_card(href_card, name_zap):
         name_zap1 = "заглушка омывателя фары"
     elif "накладка" in marka_and_model_and_num_zap:
         name_zap1 = "накладка" + ' для ' + name_zap
+    elif "заглушка фаркопа" in marka_and_model_and_num_zap:
+        name_zap1 = "заглушка фаркопа"
+    elif "датчики" in marka_and_model_and_num_zap:
+        name_zap1 = "датчики"
+    elif "капот" in marka_and_model_and_num_zap:
+        name_zap1 = "капот"
+    elif "дифузор" in marka_and_model_and_num_zap:
+        name_zap1 = "дифузор"
+    elif "спойлер" in marka_and_model_and_num_zap:
+        name_zap1 = "спойлер"
+    elif "угол бампера" in marka_and_model_and_num_zap:
+        name_zap1 = "угол бампера"
+    elif "зарядное устройство" in marka_and_model_and_num_zap:
+        name_zap1 = "зарядное устройство"
+    elif "радио" in marka_and_model_and_num_zap:
+        name_zap1 = "магнитола"
+    elif "замок зажигания" in marka_and_model_and_num_zap:
+        name_zap1 = "замок зажигания"
+    elif "шлейф" in marka_and_model_and_num_zap:
+        name_zap1 = "шлейф"
+    elif "корпус блока" in marka_and_model_and_num_zap:
+        name_zap1 = "корпус блока"
+    elif "вентилятор блока" in marka_and_model_and_num_zap:
+        name_zap1 = "вентилятор блока"
+    elif "модуль замка" in marka_and_model_and_num_zap:
+        name_zap1 = "модуль замка"
+    elif "дисплей" in marka_and_model_and_num_zap:
+        name_zap1 = "дисплей"
+    elif "камера заднего вида" in marka_and_model_and_num_zap:
+        name_zap1 = "камера заднего вида"
+    elif "усилитель радио" in marka_and_model_and_num_zap:
+        name_zap1 = "усилитель радио"
+    elif "датчик сенсор дождя" in marka_and_model_and_num_zap:
+        name_zap1 = "датчик сенсор дождя"
+    elif "декор панели" in marka_and_model_and_num_zap:
+        name_zap1 = "декор панели"
+    elif "переключатель управления" in marka_and_model_and_num_zap:
+        name_zap1 = "переключатель управления" + ' для ' + name_zap
+    elif "модуль" in marka_and_model_and_num_zap:
+        name_zap1 = "модуль"
+    elif "штекир" in marka_and_model_and_num_zap:
+        name_zap1 = "штекир"
+    elif "модуль реле свечей накаливания" in marka_and_model_and_num_zap:
+        name_zap1 = "модуль реле свечей накаливания"
+    elif "проигрыватель" in marka_and_model_and_num_zap:
+        name_zap1 = "магнитола"
+    elif "заглушка крышка фары" in marka_and_model_and_num_zap:
+        name_zap1 = "заглушка крышка фары"
+    elif "колпак стекло для фары" in marka_and_model_and_num_zap:
+        name_zap1 = "колпак стекло для фары"      
     else:
         name_zap1 = name_zap
     all_words = marka_and_model_and_num_zap.replace('-',' ').split()
