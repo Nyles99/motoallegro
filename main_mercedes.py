@@ -257,6 +257,7 @@ def pars_card(href_card, name_zap):
 
     info = soup_one.find_all("div", class_="characteristic__item")
     #print(info)
+    proizvoditel = ''
     status = "б/у"
     side = ''
     prouzbod_text = ''
