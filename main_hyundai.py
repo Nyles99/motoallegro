@@ -45,7 +45,7 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol:
     '''
 })
-with open("mercedes.json", encoding="utf-8") as file:
+with open("hyundai.json", encoding="utf-8") as file:
     sravnenue = json.load(file)
 
 
@@ -106,7 +106,7 @@ else:
 
 
 
-url = "https://motoallegro.net/ru/b-catalog/a-class/"
+url = "https://motoallegro.net/ru/b-catalog/hyundai/"
 driver.get(url=url)
 time.sleep(1)
 marka = ''
